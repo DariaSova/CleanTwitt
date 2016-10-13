@@ -1,6 +1,7 @@
 require 'sinatra' 
 require 'oauth'
 require 'twitter'
+require_relative 'config'
 require 'pry'
 
 get '/' do 
@@ -9,7 +10,7 @@ end
 
 get '/login' do
   @callback_url = "http://localhost:4567/oauth/twitter/callback"
-  @consumer = OAuth::Consumer.new("4QYCvDdOhBZTiaqLH3kv4LvAW","nBX51piLcNMn64QGoRdnbP6RS8sSsOvQYt9wSyTzWfYX36nx9G", :site => "https://api.twitter.com")
+  @consumer = OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET, site: "https://api.twitter.com")
   @request_token = @consumer.get_request_token(:oauth_callback => @callback_url)
   session[:token] = @request_token.token
   session[:token_secret] = @request_token.secret
@@ -18,12 +19,12 @@ end
 
 get '/oauth/twitter/callback' do 
   hash = { oauth_token: params[:oauth_token], oauth_token_secret: params[:oauth_verifier]}
-  @consumer = OAuth::Consumer.new("4QYCvDdOhBZTiaqLH3kv4LvAW","nBX51piLcNMn64QGoRdnbP6RS8sSsOvQYt9wSyTzWfYX36nx9G", :site => "https://api.twitter.com")
+  @consumer = OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET, site: "https://api.twitter.com")
   request_token  = OAuth::RequestToken.from_hash(@consumer, hash)
   @access_token = request_token.get_access_token(oauth_verifier: params[:oauth_verifier])
   @client = Twitter::REST::Client.new do |config|
-    config.consumer_key        = "4QYCvDdOhBZTiaqLH3kv4LvAW"
-    config.consumer_secret     = "nBX51piLcNMn64QGoRdnbP6RS8sSsOvQYt9wSyTzWfYX36nx9G"
+    config.consumer_key        = CONSUMER_KEY
+    config.consumer_secret     = CONSUMER_SECRET
     config.access_token        = @access_token.token
     config.access_token_secret = @access_token.secret
   end
