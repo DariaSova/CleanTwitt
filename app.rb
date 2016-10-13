@@ -14,10 +14,10 @@ end
 get '/login' do
   @callback_url = CALLBACK_URL
   @consumer = get_consumer
-  @request_token = @consumer.get_request_token(:oauth_callback => @callback_url)
+  @request_token = @consumer.get_request_token(oauth_callback: @callback_url)
   session[:token] = @request_token.token
   session[:token_secret] = @request_token.secret
-  redirect @request_token.authorize_url(:oauth_callback => @callback_url)
+  redirect @request_token.authorize_url(oauth_callback: @callback_url)
 end
 
 get '/oauth/twitter/callback' do
@@ -27,9 +27,12 @@ get '/oauth/twitter/callback' do
   request_token  = OAuth::RequestToken.from_hash(@consumer, hash)
   @access_token = request_token.get_access_token(oauth_verifier: params[:oauth_verifier])
   @client = get_client
-  #tweet from user's account
-  @client.update('Hola!')
-  "Woohoo! it works!"
+  #@client.update('Hola!')
+  redirect '/menu'
+end
+
+get '/menu' do
+  haml :clean_tweets
 end
 
 private
