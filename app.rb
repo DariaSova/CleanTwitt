@@ -36,6 +36,11 @@ class Application < Sinatra::Base
     haml :clean_tweets
   end
 
+  get '/destroy_all_tweets' do
+    settings.cleanTwit.delete_all_tweets
+    redirect '/menu'
+  end
+
   private
   def get_consumer
     OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET, site: "https://api.twitter.com")
